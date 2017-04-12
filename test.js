@@ -14,7 +14,7 @@ import infernoCreateElement from 'inferno-create-element'
 import InfernoServer from 'inferno-server'
 
 // Our library!
-import createComponent from './index.js'
+import componentFactory from './index.js'
 
 // Assertion library
 import chai from 'chai'
@@ -26,19 +26,19 @@ const objWithRender = (hyperscript) => ({
   }
 })
 
-describe('createComponent', () => {
+describe('componentFactory', () => {
   it('Should be a function', () => {
-    expect(createComponent).to.be.a('function')
+    expect(componentFactory).to.be.a('function')
   })
 
   it('Should create a Preact component', () => {
-    const Test = createComponent(Component, objWithRender(h))
+    const Test = componentFactory(Component, objWithRender(h))
     const output = render(h(Test))
     expect(output).to.equal('<div>Hello world</div>')
   })
 
   it('Should create a React component', () => {
-    const Test = createComponent(React.Component, objWithRender(React.createElement))
+    const Test = componentFactory(React.Component, objWithRender(React.createElement))
 
     const shallowRenderer = new ReactShallowRenderer()
     shallowRenderer.render(React.createElement(Test))
@@ -49,7 +49,7 @@ describe('createComponent', () => {
   })
 
   it('Should create an Inferno component', () => {
-    const Test = createComponent(InfernoComponent, objWithRender(infernoCreateElement))
+    const Test = componentFactory(InfernoComponent, objWithRender(infernoCreateElement))
     const output = InfernoServer.renderToString(infernoCreateElement(Test))
     expect(output).to.equal('<div>Hello world</div>')
   })

@@ -1,7 +1,7 @@
 {
-  "name": "preact-classless-component",
+  "name": "component-factory",
   "version": "1.0.6",
-  "description": "A utility method to create preact components without using class keyword",
+  "description": "A utility method to create react, preact, inferno components without using class keyword",
   "main": "./dist/index.js",
   "keywords": [
     "preact",
@@ -11,13 +11,13 @@
   ],
   "author": "staydecent",
   "license": "MIT",
-  "homepage": "https://github.com/staydecent/preact-classless-component#readme",
+  "homepage": "https://github.com/staydecent/component-factory#readme",
   "bugs": {
-    "url": "https://github.com/staydecent/preact-classless-component/issues"
+    "url": "https://github.com/staydecent/component-factory/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/staydecent/preact-classless-component.git"
+    "url": "git+https://github.com/staydecent/component-factory.git"
   },
   "scripts": {
     "std": "standard --verbose | snazzy",
