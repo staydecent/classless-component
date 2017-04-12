@@ -1,26 +1,24 @@
-import { Component } from 'preact';
-
-export default function(obj) {
-  function preactComponent() {
-    Component.apply(this, arguments);
+export default function (Component, obj) {
+  function componentFactory () {
+    Component.apply(this, arguments)
 
     // auto-bind methods to the component
     for (let i in obj) {
       if (i !== 'render' && typeof obj[i] === 'function') {
-        this[i] = obj[i].bind(this);
+        this[i] = obj[i].bind(this)
       }
     }
 
     if (obj.init) {
-      obj.init.call(this);
+      obj.init.call(this)
     }
   }
 
-  preactComponent.prototype = Object.assign(
+  componentFactory.prototype = Object.assign(
     Object.create(Component.prototype), obj
-  );
+  )
 
-  preactComponent.prototype.constructor = preactComponent;
+  componentFactory.prototype.constructor = componentFactory
 
-  return preactComponent;
+  return componentFactory
 }
