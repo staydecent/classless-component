@@ -1,5 +1,5 @@
 export default function (Component, obj) {
-  function componentFactory () {
+  function classlessComponent () {
     Component.apply(this, arguments)
 
     // auto-bind methods to the component
@@ -14,11 +14,11 @@ export default function (Component, obj) {
     }
   }
 
-  componentFactory.prototype = Object.assign(
+  classlessComponent.prototype = Object.assign(
     Object.create(Component.prototype), obj
   )
 
-  componentFactory.prototype.constructor = componentFactory
+  classlessComponent.prototype.constructor = classlessComponent
 
-  return componentFactory
+  return classlessComponent
 }
