@@ -3,18 +3,13 @@ const toType = function (val) {
   return str.toLowerCase().slice(8, -1)
 }
 
-module.exports = {
-  compose,
-  withState
-}
-
 /**
  * Create a class-based Component out of object literals
  * @param  {function} Component React, Preact, Inferno Component creator
  * @param  {object}   objs      object-literals containing lifecycle methods etc.
  * @return {Component}          The final Component to render
  */
-function compose () {
+export function compose () {
   const args = Array.prototype.slice.call(arguments)
   const Component = args[0]
   const objs = args.slice(1).map((obj) =>
@@ -59,7 +54,7 @@ function compose () {
  * @param  {[type]} initialValue) [description]
  * @return {[type]}               [description]
  */
-function withState (propName, setterName, initialValue) {
+export function withState (propName, setterName, initialValue) {
   return {
     state: {[propName]: initialValue},
     [setterName]: function setter (val) {
