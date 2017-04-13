@@ -31,38 +31,35 @@ export function compose () {
   )
   const obj = Object.assign.apply(Object, [{}].concat(objs))
   const userRender = obj.render.bind(null)
-  const pfc = function (props) {
-    let newProps = Object.assign({}, props)
+  const pfc = (props) => userRender(props)
+
+  obj.render = function () {
+    let props = _arbitraryFuncs.call(this, this.props)
 
     // handle mapProps
     if (obj._mapProps) {
-      Object.assign(newProps, obj._mapProps.call(this, props))
-      delete obj._mapProps
+      Object.assign(props, obj._mapProps.call(this, props))
+      delete props._mapProps
     }
 
     // handle withState
     if (obj._mergeState) {
       // Pass props to _initialValue function to set initialValue for withState
       if (obj._initialValue && obj._initialValue.length === 2) {
-        Object.assign(obj.state, {[obj._initialValue[0]]: obj._initialValue[1].call(null, newProps)})
-        delete obj._initialValue
+        Object.assign(obj.state, {[obj._initialValue[0]]: obj._initialValue[1].call(null, props)})
+        delete props._initialValue
       }
 
       // Bind withState setter
       const setter = obj[obj._mergeState].bind(this)
       Object.assign(obj.state, {[obj._mergeState]: setter})
-      delete obj._mergeState
+      delete props._mergeState
     }
 
     // Always pass the state of the hoc to the pfc as props
-    Object.assign(newProps, obj.state)
+    Object.assign(props, obj.state)
 
-    const node = userRender(newProps)
-    return node
-  }
-
-  obj.render = function () {
-    return h(pfc, this.props)
+    return h(pfc, props)
   }
 
   // Create a HoC class, avoiding class syntax
@@ -88,6 +85,27 @@ export function compose () {
   hoc.prototype.constructor = hoc
 
   return hoc
+}
+
+function _arbitraryFuncs (props) {
+  const newProps = Object.assign({}, props)
+  const ignore = [
+    'componentWillMount',
+    'componentDidMount',
+    'componentWillUnmount',
+    'componentDidUnmount',
+    'componentWillReceiveProps',
+    'shouldComponentUpdate',
+    'componentWillUpdate',
+    'componentDidUpdate'
+  ]
+  const keys = Object.keys(this)
+  for (var x = 0; x < keys.length; x++) {
+    if (toType(this[keys[x]]) === 'function' && ignore.indexOf(keys[x]) === -1) {
+      newProps[keys[x]] = this[keys[x]]
+    }
+  }
+  return newProps
 }
 
 /**

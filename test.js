@@ -61,6 +61,19 @@ describe('compose', () => {
     const output = render(h(Test, {propNum: 4}))
     expect(output).to.equal('<div>Hello 8</div>')
   })
+
+  it('Should pass arbitrary functions as props to PFC', () => {
+    const Test = compose(Component, h,
+      function someFunction () {
+        return 8
+      },
+      function render ({someFunction}) {
+        return h('div', null, 'Hello ' + someFunction())
+      }
+    )
+    const output = render(h(Test))
+    expect(output).to.equal('<div>Hello 8</div>')
+  })
 })
 
 describe('withState', () => {
@@ -68,6 +81,7 @@ describe('withState', () => {
     const Counter = compose(Component, h,
       withState('counter', 'setCounter', 0),
       function render ({counter, setCounter}) {
+        setCounter(counter + 1)
         return h('div', null, [
           'Count: ' + counter,
           h('button', {onClick: () => setCounter(n => n + 1)}, 'Increment'),

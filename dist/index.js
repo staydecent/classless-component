@@ -46,37 +46,36 @@ function compose() {
   var obj = Object.assign.apply(Object, [{}].concat(objs));
   var userRender = obj.render.bind(null);
   var pfc = function pfc(props) {
-    var newProps = _extends({}, props);
+    return userRender(props);
+  };
+
+  obj.render = function () {
+    var props = _arbitraryFuncs.call(this, this.props);
 
     // handle mapProps
     if (obj._mapProps) {
-      _extends(newProps, obj._mapProps.call(this, props));
-      delete obj._mapProps;
+      _extends(props, obj._mapProps.call(this, props));
+      delete props._mapProps;
     }
 
     // handle withState
     if (obj._mergeState) {
       // Pass props to _initialValue function to set initialValue for withState
       if (obj._initialValue && obj._initialValue.length === 2) {
-        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].call(null, newProps)));
-        delete obj._initialValue;
+        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].call(null, props)));
+        delete props._initialValue;
       }
 
       // Bind withState setter
       var setter = obj[obj._mergeState].bind(this);
       _extends(obj.state, _defineProperty({}, obj._mergeState, setter));
-      delete obj._mergeState;
+      delete props._mergeState;
     }
 
     // Always pass the state of the hoc to the pfc as props
-    _extends(newProps, obj.state);
+    _extends(props, obj.state);
 
-    var node = userRender(newProps);
-    return node;
-  };
-
-  obj.render = function () {
-    return h(pfc, this.props);
+    return h(pfc, props);
   };
 
   // Create a HoC class, avoiding class syntax
@@ -100,6 +99,18 @@ function compose() {
   hoc.prototype.constructor = hoc;
 
   return hoc;
+}
+
+function _arbitraryFuncs(props) {
+  var newProps = _extends({}, props);
+  var ignore = ['componentWillMount', 'componentDidMount', 'componentWillUnmount', 'componentDidUnmount', 'componentWillReceiveProps', 'shouldComponentUpdate', 'componentWillUpdate', 'componentDidUpdate'];
+  var keys = Object.keys(this);
+  for (var x = 0; x < keys.length; x++) {
+    if (toType(this[keys[x]]) === 'function' && ignore.indexOf(keys[x]) === -1) {
+      newProps[keys[x]] = this[keys[x]];
+    }
+  }
+  return newProps;
 }
 
 /**
