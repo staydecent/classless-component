@@ -19,45 +19,70 @@ var toType = function toType(val) {
 
 /**
  * Create a class-based Component out of object literals
- * @param  {function} Component React, Preact, Inferno Component creator
- * @param  {object}   objs      object-literals containing lifecycle methods etc.
- * @return {Component}          The final Component to render
+ * @param  {Function} Component   React, Preact, Inferno Component creator
+ * @param  {Function} hyperscript React, Preact, Inferno element/vnode creator
+ * @param  {Object}   objs        object-literals containing lifecycle methods etc.
+ * @return {Component}            The final Component to render
  */
 function compose() {
   var args = Array.prototype.slice.call(arguments);
   var Component = args[0];
-  var objs = args.slice(1).map(function (obj) {
+  var h = args[1];
+
+  if (toType(Component) !== 'function' || toType(h) !== 'function') {
+    throw new Error('compose expects to be called like, `compose(Component, createElement, [{}, {}, ...]`');
+  }
+
+  // Allow partial appliction for reuse, ex:
+  // `const preactCompose = compose(Component, h)`
+  // `preactCompose(withState(..), {}, ...)`
+  if (args.length <= 2) {
+    return compose.bind(null, Component, h);
+  }
+
+  var objs = args.slice(2).map(function (obj) {
     return toType(obj) === 'function' ? _defineProperty({}, obj.name, obj) : obj;
   });
   var obj = Object.assign.apply(Object, [{}].concat(objs));
+  var userRender = obj.render.bind(null);
+  var pfc = function pfc(props) {
+    var newProps = _extends({}, props);
 
-  function classlessComponent() {
-    var args = Array.prototype.slice.call(arguments);
-
-    // Return new props, instead if requiring R.pipe or similar
+    // handle mapProps
     if (obj._mapProps) {
-      var newProps = obj._mapProps.apply(this, args);
-      args[0] = _extends(args[0], newProps);
+      _extends(newProps, obj._mapProps.call(this, props));
       delete obj._mapProps;
     }
 
+    // handle withState
     if (obj._mergeState) {
       // Pass props to _initialValue function to set initialValue for withState
       if (obj._initialValue && obj._initialValue.length === 2) {
-        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].apply(null, args)));
+        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].call(null, newProps)));
         delete obj._initialValue;
       }
 
       // Bind withState setter and assign state to props
       var setter = obj[obj._mergeState].bind(this);
-      args[0] = _extends(args[0], obj.state, _defineProperty({}, obj._mergeState, setter));
+      _extends(newProps, obj.state, _defineProperty({}, obj._mergeState, setter));
       delete obj._mergeState;
     }
 
-    Component.apply(this, args);
+    var node = userRender(newProps);
+    return node;
+  };
 
+  obj.render = function () {
+    return h(pfc, this.props);
+  };
+
+  // Create a HoC class, avoiding class syntax
+  function hoc() {
+    Component.apply(this, arguments);
+
+    // auto-bind methods to the component
     for (var i in obj) {
-      if (i !== 'render' && typeof obj[i] === 'function') {
+      if (i !== 'render' && toType(obj[i]) === 'function') {
         this[i] = obj[i].bind(this);
       }
     }
@@ -67,11 +92,11 @@ function compose() {
     }
   }
 
-  classlessComponent.prototype = _extends(Object.create(Component.prototype), obj);
+  hoc.prototype = _extends(Object.create(Component.prototype), obj);
 
-  classlessComponent.prototype.constructor = classlessComponent;
+  hoc.prototype.constructor = hoc;
 
-  return classlessComponent;
+  return hoc;
 }
 
 /**
