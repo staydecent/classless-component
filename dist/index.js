@@ -8,6 +8,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.compose = compose;
 exports.withState = withState;
+exports.mapProps = mapProps;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -32,6 +33,13 @@ function compose() {
 
   function classlessComponent() {
     var args = Array.prototype.slice.call(arguments);
+
+    // Return new props, instead if requiring R.pipe or similar
+    if (obj._mapProps) {
+      var newProps = obj._mapProps.apply(this, args);
+      args[0] = _extends(args[0], newProps);
+      delete obj._mapProps;
+    }
 
     if (obj._mergeState) {
       // Pass props to _initialValue function to set initialValue for withState
@@ -86,4 +94,13 @@ function withState(propName, setterName, initialValue) {
     obj.state = _defineProperty({}, propName, initialValue);
   }
   return obj;
+}
+
+/**
+ * Pass props to function, that returns new props
+ * @param  {Function} fn (ownerProps: Object) => Object
+ * @return {Object}
+ */
+function mapProps(fn) {
+  return { _mapProps: fn };
 }

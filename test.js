@@ -14,7 +14,7 @@ import infernoCreateElement from 'inferno-create-element'
 import InfernoServer from 'inferno-server'
 
 // Our library!
-import {compose, withState} from './index'
+import {compose, withState, mapProps} from './index'
 
 // Assertion library
 import chai from 'chai'
@@ -84,5 +84,20 @@ describe('withState', () => {
     )
     const output = render(h(Counter, {count: 2}))
     expect(output).to.equal('<div>Count: 2<button>Increment</button><button>Decrement</button></div>')
+  })
+})
+
+describe('mapProps', () => {
+  it('Should work', () => {
+    const List = compose(Component,
+      mapProps(({nums}) => ({nums: nums.map((n) => n + 1)})),
+      function render ({nums}) {
+        return h('div', null, [
+          'List: ' + (nums && nums.join(', '))
+        ])
+      }
+    )
+    const output = render(h(List, {nums: [1, 2, 3, 4, 5]}))
+    expect(output).to.equal('<div>List: 2, 3, 4, 5, 6</div>')
   })
 })

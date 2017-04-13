@@ -20,6 +20,13 @@ export function compose () {
   function classlessComponent () {
     const args = Array.prototype.slice.call(arguments)
 
+    // Return new props, instead if requiring R.pipe or similar
+    if (obj._mapProps) {
+      const newProps = obj._mapProps.apply(this, args)
+      args[0] = Object.assign(args[0], newProps)
+      delete obj._mapProps
+    }
+
     if (obj._mergeState) {
       // Pass props to _initialValue function to set initialValue for withState
       if (obj._initialValue && obj._initialValue.length === 2) {
@@ -76,4 +83,13 @@ export function withState (propName, setterName, initialValue) {
     obj.state = {[propName]: initialValue}
   }
   return obj
+}
+
+/**
+ * Pass props to function, that returns new props
+ * @param  {Function} fn (ownerProps: Object) => Object
+ * @return {Object}
+ */
+export function mapProps (fn) {
+  return {_mapProps: fn}
 }
