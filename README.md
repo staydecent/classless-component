@@ -13,7 +13,7 @@ $ npm install --save classless-component
 ### Usage
 
 ```js
-import classlessComponent from 'classless-component'
+import {compose} from 'classless-component'
 
 import {Component} from 'preact'
 // or
@@ -21,17 +21,38 @@ import {Component} from 'preact'
 // or
 // import Component from 'inferno-component'
 
-const HelloWorld = classlessComponent(Component, {
+const HelloWorld = compose(Component, {
 	render(props, state) {
 		return (
-			<div>
-				Hello world!			
-			</div>
+			<div>Hello world!</div>
 		)
 	}
 })
-
 ```
+
+Also included at this time, are two functions inspired by [recompose](https://github.com/acdlite/recompose)
+
+```js
+import {compose, withState, mapProps} from 'classless-component'
+import {Component} from 'preact'
+
+const Counter = compose(Component,
+	// The withState function will create an object literal to pass to `compose`
+	// As well as pass the state value of 'counter' and the setter function 'setCounter' to the props object
+	withState('counter', 'setCounter', 0),
+	
+	// passing a named function will result in an object literal like: `{render: render}`
+	function render ({counter, setCounter}) {
+		return h('div', null, [
+			'Count: ' + counter,
+			h('button', {onClick: () => setCounter(n => n + 1)}, 'Increment'),
+			h('button', {onClick: () => setCounter(n => n - 1)}, 'Decrement')
+		])
+	}
+)
+```
+
+For working examples, see `test.js`.
 
 ### Acknowledgments
 
