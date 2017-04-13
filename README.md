@@ -4,6 +4,10 @@
 
 If you use [React](https://github.com/facebook/react), [Preact](https://github.com/developit/preact), or [Inferno](https://github.com/infernojs/inferno), but don't want to use the `class` syntax because you've read articles by [Eric Elliott](https://medium.com/javascript-scene/a-simple-challenge-to-classical-inheritance-fans-e78c2cf5eead#.a3ako7xx9) and others that have lead you to favour object composition over class inheritance, then this utility is for you. 
 
+### Under Rapid Development!
+
+Annoyed that [recompose](https://github.com/acdlite/recompose) was coupled to React and [Incompose](https://github.com/zanettin/incompose/) to Inferno, and wanting a solution for [Preact](https://github.com/developit/preact/), I set out to see how hard a de-coupled library would be. Instead of assuming one of the aforementioned libraries, the `compose` function accepts the Base Component Class (`React.Component`, `InfernoComponent`, ...) and the hyperscript function (`React.createElement`, `Preact.h`, ...) as the first two parameters.
+
 ### Installation
 
 ```
@@ -12,47 +16,7 @@ $ npm install --save classless-component
 
 ### Usage
 
-```js
-import {compose} from 'classless-component'
-
-import {Component} from 'preact'
-// or
-// import {Component} from 'react'
-// or
-// import Component from 'inferno-component'
-
-const HelloWorld = compose(Component, {
-	render(props, state) {
-		return (
-			<div>Hello world!</div>
-		)
-	}
-})
-```
-
-Also included at this time, are two functions inspired by [recompose](https://github.com/acdlite/recompose)
-
-```js
-import {compose, withState, mapProps} from 'classless-component'
-import {Component} from 'preact'
-
-const Counter = compose(Component,
-	// The withState function will create an object literal to pass to `compose`
-	// As well as pass the state value of 'counter' and the setter function 'setCounter' to the props object
-	withState('counter', 'setCounter', 0),
-	
-	// passing a named function will result in an object literal like: `{render: render}`
-	function render ({counter, setCounter}) {
-		return h('div', null, [
-			'Count: ' + counter,
-			h('button', {onClick: () => setCounter(n => n + 1)}, 'Increment'),
-			h('button', {onClick: () => setCounter(n => n - 1)}, 'Decrement')
-		])
-	}
-)
-```
-
-For working examples, see `test.js`.
+As this is in rapid development, and by no means stable, please refer to the `test.js` file for working examples.
 
 ### Acknowledgments
 
