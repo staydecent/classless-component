@@ -19,7 +19,15 @@ export function compose () {
 
   function classlessComponent () {
     const args = Array.prototype.slice.call(arguments)
-    if (obj._mergeState && obj.state) {
+
+    if (obj._mergeState) {
+      // Pass props to _initialValue function to set initialValue for withState
+      if (obj._initialValue && obj._initialValue.length === 2) {
+        Object.assign(obj.state, {[obj._initialValue[0]]: obj._initialValue[1].apply(null, args)})
+        delete obj._initialValue
+      }
+
+      // Bind withState setter and assign state to props
       const setter = obj[obj._mergeState].bind(this)
       args[0] = Object.assign(args[0], obj.state, {[obj._mergeState]: setter})
       delete obj._mergeState
@@ -55,11 +63,17 @@ export function compose () {
  * @return {[type]}               [description]
  */
 export function withState (propName, setterName, initialValue) {
-  return {
-    state: {[propName]: initialValue},
+  const obj = {
     [setterName]: function setter (val) {
       this.setState({[propName]: val})
     },
     _mergeState: setterName
   }
+  if (toType(initialValue) === 'function') {
+    obj._initialValue = [propName, initialValue]
+    obj.state = {}
+  } else {
+    obj.state = {[propName]: initialValue}
+  }
+  return obj
 }

@@ -70,4 +70,19 @@ describe('withState', () => {
     const output = render(h(Counter))
     expect(output).to.equal('<div>Count: 0<button>Increment</button><button>Decrement</button></div>')
   })
+
+  it('Should pass props to initialValue function', () => {
+    const Counter = compose(Component,
+      withState('counter', 'setCounter', ({count}) => count),
+      function render ({counter, setCounter}) {
+        return h('div', null, [
+          'Count: ' + counter,
+          h('button', {onClick: () => setCounter(n => n + 1)}, 'Increment'),
+          h('button', {onClick: () => setCounter(n => n - 1)}, 'Decrement')
+        ])
+      }
+    )
+    const output = render(h(Counter, {count: 2}))
+    expect(output).to.equal('<div>Count: 2<button>Increment</button><button>Decrement</button></div>')
+  })
 })
