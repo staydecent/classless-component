@@ -32,7 +32,15 @@ function compose() {
 
   function classlessComponent() {
     var args = Array.prototype.slice.call(arguments);
-    if (obj._mergeState && obj.state) {
+
+    if (obj._mergeState) {
+      // Pass props to _initialValue function to set initialValue for withState
+      if (obj._initialValue && obj._initialValue.length === 2) {
+        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].apply(null, args)));
+        delete obj._initialValue;
+      }
+
+      // Bind withState setter and assign state to props
       var setter = obj[obj._mergeState].bind(this);
       args[0] = _extends(args[0], obj.state, _defineProperty({}, obj._mergeState, setter));
       delete obj._mergeState;
@@ -66,11 +74,16 @@ function compose() {
  * @return {[type]}               [description]
  */
 function withState(propName, setterName, initialValue) {
-  var _ref2;
+  var _obj;
 
-  return _ref2 = {
-    state: _defineProperty({}, propName, initialValue)
-  }, _defineProperty(_ref2, setterName, function setter(val) {
+  var obj = (_obj = {}, _defineProperty(_obj, setterName, function setter(val) {
     this.setState(_defineProperty({}, propName, val));
-  }), _defineProperty(_ref2, '_mergeState', setterName), _ref2;
+  }), _defineProperty(_obj, '_mergeState', setterName), _obj);
+  if (toType(initialValue) === 'function') {
+    obj._initialValue = [propName, initialValue];
+    obj.state = {};
+  } else {
+    obj.state = _defineProperty({}, propName, initialValue);
+  }
+  return obj;
 }
