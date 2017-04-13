@@ -56,8 +56,13 @@ export function compose () {
       delete props._mergeState
     }
 
-    // Always pass the state of the hoc to the pfc as props
-    Object.assign(props, obj.state)
+    // Pass the state of the hoc to the pfc as props
+    if (this.state) {
+      const stateKeys = Object.keys(this.state)
+      for (let x = 0; x < stateKeys.length; x++) {
+        props[stateKeys[x]] = this.state[stateKeys[x]]
+      }
+    }
 
     return h(pfc, props)
   }
