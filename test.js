@@ -14,7 +14,7 @@ import infernoCreateElement from 'inferno-create-element'
 import InfernoServer from 'inferno-server'
 
 // Our library!
-import classlessComponent from './index.js'
+import {compose, withState} from './index'
 
 // Assertion library
 import chai from 'chai'
@@ -26,19 +26,19 @@ const objWithRender = (hyperscript) => ({
   }
 })
 
-describe('classlessComponent', () => {
+describe('compose', () => {
   it('Should be a function', () => {
-    expect(classlessComponent).to.be.a('function')
+    expect(compose).to.be.a('function')
   })
 
   it('Should create a Preact component', () => {
-    const Test = classlessComponent(Component, objWithRender(h))
+    const Test = compose(Component, objWithRender(h))
     const output = render(h(Test))
     expect(output).to.equal('<div>Hello world</div>')
   })
 
   it('Should create a React component', () => {
-    const Test = classlessComponent(React.Component, objWithRender(React.createElement))
+    const Test = compose(React.Component, objWithRender(React.createElement))
 
     const shallowRenderer = new ReactShallowRenderer()
     shallowRenderer.render(React.createElement(Test))
@@ -49,8 +49,25 @@ describe('classlessComponent', () => {
   })
 
   it('Should create an Inferno component', () => {
-    const Test = classlessComponent(InfernoComponent, objWithRender(infernoCreateElement))
+    const Test = compose(InfernoComponent, objWithRender(infernoCreateElement))
     const output = InfernoServer.renderToString(infernoCreateElement(Test))
     expect(output).to.equal('<div>Hello world</div>')
+  })
+})
+
+describe('withState', () => {
+  it('Should set state prop and pass to render', () => {
+    const Counter = compose(Component,
+      withState('counter', 'setCounter', 0),
+      function render ({counter, setCounter}) {
+        return h('div', null, [
+          'Count: ' + counter,
+          h('button', {onClick: () => setCounter(n => n + 1)}, 'Increment'),
+          h('button', {onClick: () => setCounter(n => n - 1)}, 'Decrement')
+        ])
+      }
+    )
+    const output = render(h(Counter))
+    expect(output).to.equal('<div>Count: 0<button>Increment</button><button>Decrement</button></div>')
   })
 })
