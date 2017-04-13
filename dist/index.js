@@ -62,11 +62,14 @@ function compose() {
         delete obj._initialValue;
       }
 
-      // Bind withState setter and assign state to props
+      // Bind withState setter
       var setter = obj[obj._mergeState].bind(this);
-      _extends(newProps, obj.state, _defineProperty({}, obj._mergeState, setter));
+      _extends(obj.state, _defineProperty({}, obj._mergeState, setter));
       delete obj._mergeState;
     }
+
+    // Always pass the state of the hoc to the pfc as props
+    _extends(newProps, obj.state);
 
     var node = userRender(newProps);
     return node;

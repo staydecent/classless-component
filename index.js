@@ -48,11 +48,14 @@ export function compose () {
         delete obj._initialValue
       }
 
-      // Bind withState setter and assign state to props
+      // Bind withState setter
       const setter = obj[obj._mergeState].bind(this)
-      Object.assign(newProps, obj.state, {[obj._mergeState]: setter})
+      Object.assign(obj.state, {[obj._mergeState]: setter})
       delete obj._mergeState
     }
+
+    // Always pass the state of the hoc to the pfc as props
+    Object.assign(newProps, obj.state)
 
     const node = userRender(newProps)
     return node

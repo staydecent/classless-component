@@ -50,6 +50,17 @@ describe('compose', () => {
     const output = InfernoServer.renderToString(infernoCreateElement(Test))
     expect(output).to.equal('<div>Hello world</div>')
   })
+
+  it('Should pass state as props to PFC', () => {
+    const Test = compose(Component, h,
+      {state: {stateNum: 2}},
+      function render ({stateNum, propNum}) {
+        return h('div', null, 'Hello ' + (stateNum * propNum))
+      }
+    )
+    const output = render(h(Test, {propNum: 4}))
+    expect(output).to.equal('<div>Hello 8</div>')
+  })
 })
 
 describe('withState', () => {
