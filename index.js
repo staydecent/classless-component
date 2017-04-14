@@ -64,9 +64,9 @@ export function compose () {
   function hoc () {
     Component.apply(this, arguments)
 
-    if (obj._initialValue && obj._initialValue.length === 2) {
-      Object.assign(this.state, {[obj._initialValue[0]]: obj._initialValue[1].apply(null, arguments)})
-      delete obj._initialValue
+    if (this._initialValue && this._initialValue.length === 2) {
+      Object.assign(this.state, {[this._initialValue[0]]: this._initialValue[1].apply(null, arguments)})
+      delete this._initialValue
     }
 
     // auto-bind methods to the component

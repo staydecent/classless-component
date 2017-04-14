@@ -58,15 +58,8 @@ function compose() {
       delete props._mapProps;
     }
 
-    // handle withState
+    // Bind withState setter
     if (obj._mergeState) {
-      // Pass props to _initialValue function to set initialValue for withState
-      if (obj._initialValue && obj._initialValue.length === 2) {
-        _extends(obj.state, _defineProperty({}, obj._initialValue[0], obj._initialValue[1].call(null, props)));
-        delete props._initialValue;
-      }
-
-      // Bind withState setter
       var setter = obj[obj._mergeState].bind(this);
       _extends(obj.state, _defineProperty({}, obj._mergeState, setter));
       delete props._mergeState;
@@ -86,6 +79,11 @@ function compose() {
   // Create a HoC class, avoiding class syntax
   function hoc() {
     Component.apply(this, arguments);
+
+    if (this._initialValue && this._initialValue.length === 2) {
+      _extends(this.state, _defineProperty({}, this._initialValue[0], this._initialValue[1].apply(null, arguments)));
+      delete this._initialValue;
+    }
 
     // auto-bind methods to the component
     for (var i in obj) {
@@ -133,7 +131,7 @@ function withState(propName, setterName, initialValue) {
   }), _defineProperty(_obj, '_mergeState', setterName), _obj);
   if (toType(initialValue) === 'function') {
     obj._initialValue = [propName, initialValue];
-    obj.state = {};
+    obj.state = _defineProperty({}, propName, null);
   } else {
     obj.state = _defineProperty({}, propName, initialValue);
   }
