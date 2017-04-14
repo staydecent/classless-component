@@ -95,7 +95,10 @@ describe('withState', () => {
 
   it('Should pass props to initialValue function', () => {
     const Counter = compose(Component, h,
-      withState('counter', 'setCounter', ({count}) => count),
+      withState('counter', 'setCounter', ({counter}) => counter * counter),
+      function componentWillMount () {
+        this.setState({counter: this.state.counter * this.state.counter})
+      },
       function render ({counter, setCounter}) {
         return h('div', null, [
           'Count: ' + counter,
@@ -104,19 +107,19 @@ describe('withState', () => {
         ])
       }
     )
-    const output = render(h(Counter, {count: 2}))
-    expect(output).to.equal('<div>Count: 2<button>Increment</button><button>Decrement</button></div>')
+    const output = render(h(Counter, {counter: 2}))
+    expect(output).to.equal('<div>Count: 16<button>Increment</button><button>Decrement</button></div>')
   })
 
   it('Should work with React', () => {
     const Counter = compose(React.Component, React.createElement,
-      withState('counter', 'setCounter', ({count}) => count),
+      withState('counter', 'setCounter', ({counter}) => counter),
       function render ({counter, setCounter}) {
         return React.createElement('div', null, ['Count: ' + counter])
       }
     )
     const renderer = ReactTestRenderer.create(
-      React.createElement(Counter, {count: 5}))
+      React.createElement(Counter, {counter: 5}))
     const output = renderer.toJSON()
     expect(output.type).to.equal('div')
     expect(output.children[0]).to.equal('Count: 5')
