@@ -14,7 +14,7 @@ import infernoCreateElement from 'inferno-create-element'
 import InfernoServer from 'inferno-server'
 
 // Our library!
-import {compose, withState, mapProps} from './index'
+import {compose, withState, mapProps, setNodeName} from './index'
 
 // Assertion library
 import chai from 'chai'
@@ -154,5 +154,18 @@ describe('mapProps', () => {
     const output = renderer.toJSON()
     expect(output.type).to.equal('div')
     expect(output.children[0]).to.equal('List: 2, 3, 4, 5, 6')
+  })
+})
+
+describe('setNodeName', () => {
+  it('Should set nodeName to not be "hoc"', () => {
+    const List = compose(Component, h,
+      setNodeName('CoolComponent'),
+      function render () {
+        return h('div', null, ['Cool!'])
+      }
+    )
+    const comp = h(List, {nums: [1, 2, 3, 4, 5]})
+    expect(comp.nodeName.name).to.equal('CoolComponent')
   })
 })

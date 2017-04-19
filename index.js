@@ -87,6 +87,11 @@ export function compose () {
 
   hoc.prototype.constructor = hoc
 
+  if (obj._setNodeName) {
+    Object.defineProperty(hoc, 'name', {value: obj._setNodeName})
+    delete obj._setNodeName
+  }
+
   return hoc
 }
 
@@ -141,4 +146,8 @@ export function withState (propName, setterName, initialValue) {
  */
 export function mapProps (fn) {
   return {_mapProps: fn}
+}
+
+export function setNodeName (string) {
+  return {_setNodeName: string}
 }
