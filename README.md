@@ -18,6 +18,21 @@ $ npm install --save classless-component
 
 As this is in rapid development, and by no means stable, please refer to the `test.js` file for working examples.
 
+### `Functions as params are deprecated.`
+
+Previously, the following worked:
+```javascript
+const Comp = compose(Component, Preact.h,
+  function componentWillMount () {
+    ...
+  }
+)
+```
+
+And the name of the function would be magically assigned to a new object. This caused issues when using UglifyJS to minify the code (as the function referance name was no longer guaranteed).
+
+Instead, each param should be an explicit object with property names for `render`, `componentDidMount`, etc.
+
 ### Acknowledgments
 
 Based on [preact-classless-component](https://github.com/laurencedorman/preact-classless-component) by Laurence Dorman.

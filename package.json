@@ -22,7 +22,7 @@
   "scripts": {
     "std": "standard --verbose | snazzy",
     "prebuild": "npm run std",
-    "build": "babel index.js | uglifyjs -c warnings=false > dist/index.js",
+    "build": "babel index.js | uglifyjs -c warnings=false -o dist/index.js",
     "pretest": "npm run std",
     "test": "mocha --compilers js:babel-register"
   },
@@ -43,6 +43,7 @@
     "react-test-renderer": "^15.6.1",
     "snazzy": "^7.0.0",
     "standard": "^10.0.2",
+    "uglify-es": "^3.2.0",
     "uglifyjs": "^2.4.11"
   },
   "babel": {

@@ -27,7 +27,9 @@ export function compose () {
   }
 
   const objs = args.slice(2).map((obj) =>
-    toType(obj) === 'function' ? {[obj.name]: obj} : obj
+    (toType(obj) === 'function' &&
+      console.warn('Functions as params are deprecated.')) ||
+      obj
   )
   const obj = Object.assign.apply(Object, [{}].concat(objs))
   const userRender = obj.render.bind(null)
