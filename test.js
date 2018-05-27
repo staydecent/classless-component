@@ -9,9 +9,9 @@ import React from 'react'
 import ReactTestRenderer from 'react-test-renderer'
 
 // Inferno
-import InfernoComponent from 'inferno-component'
-import infernoCreateElement from 'inferno-create-element'
-import InfernoServer from 'inferno-server'
+import {Component as InfernoComponent} from 'inferno'
+import {createElement as infernoCreateElement} from 'inferno-create-element'
+import {renderToString as infernoRenderToString} from 'inferno-server'
 
 // Our library!
 import {compose, withState, mapProps, setNodeName} from './index'
@@ -47,7 +47,7 @@ describe('compose', () => {
 
   it('Should create an Inferno component', () => {
     const Test = compose(InfernoComponent, infernoCreateElement, objWithRender(infernoCreateElement))
-    const output = InfernoServer.renderToString(infernoCreateElement(Test))
+    const output = infernoRenderToString(infernoCreateElement(Test))
     expect(output).to.equal('<div>Hello world</div>')
   })
 

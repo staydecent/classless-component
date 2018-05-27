@@ -3,6 +3,25 @@ const toType = function (val) {
   return str.toLowerCase().slice(8, -1)
 }
 
+const DEPRECATED = [
+  'componentWillMount',
+  'componentWillReceiveProps',
+  'componentWillUpdate'
+]
+
+const LIFECYCLE = [
+  'componentWillMount',
+  'componentDidMount',
+  'componentWillUnmount',
+  'componentDidUnmount',
+  'componentWillReceiveProps',
+  'shouldComponentUpdate',
+  'componentWillUpdate',
+  'componentDidUpdate',
+  'getDerivedStateFromProps',
+  'getSnapshotBeforeUpdate'
+]
+
 /**
  * Create a class-based Component out of object literals
  * @param  {Function} Component   React, Preact, Inferno Component creator
@@ -75,6 +94,8 @@ export function compose () {
     for (let i in obj) {
       if (i !== 'render' && toType(obj[i]) === 'function') {
         this[i] = obj[i].bind(this)
+        DEPRECATED.indexOf(i) !== -1 &&
+          console.warn('Lifecycle method is DEPRECATED: ' + i)
       }
     }
 
@@ -99,19 +120,9 @@ export function compose () {
 
 function _arbitraryFuncs (props) {
   const newProps = Object.assign({}, props)
-  const ignore = [
-    'componentWillMount',
-    'componentDidMount',
-    'componentWillUnmount',
-    'componentDidUnmount',
-    'componentWillReceiveProps',
-    'shouldComponentUpdate',
-    'componentWillUpdate',
-    'componentDidUpdate'
-  ]
   const keys = Object.keys(this)
   for (var x = 0; x < keys.length; x++) {
-    if (toType(this[keys[x]]) === 'function' && ignore.indexOf(keys[x]) === -1) {
+    if (toType(this[keys[x]]) === 'function' && LIFECYCLE.indexOf(keys[x]) === -1) {
       newProps[keys[x]] = this[keys[x]]
     }
   }
